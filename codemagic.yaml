@@ -1,0 +1,103 @@
+workflows:
+  android-debug-workflow:
+    name: Android Debug Build
+    max_build_duration: 60
+    instance_type: linux_x2
+    environment:
+      vars:
+        PACKAGE_NAME: "com.aistudio.sahamontaj.pqvzkt"
+      java: 17
+    triggering:
+      events:
+        - push
+        - pull_request
+      branch_patterns:
+        - pattern: main
+          include: true
+          source: true
+    scripts:
+      - name: Set Android SDK location
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+      - name: Restore debug.keystore from base64
+        script: |
+          if [ -f "$CM_BUILD_DIR/debug.keystore.base64" ]; then
+            base64 -d "$CM_BUILD_DIR/debug.keystore.base64" > "$CM_BUILD_DIR/debug.keystore"
+            echo "debug.keystore restored."
+          else
+            echo "debug.keystore.base64 not found, skipping."
+          fi
+      - name: Create .env file from .env.example if missing
+        script: |
+          if [ ! -f "$CM_BUILD_DIR/.env" ] && [ -f "$CM_BUILD_DIR/.env.example" ]; then
+            cp "$CM_BUILD_DIR/.env.example" "$CM_BUILD_DIR/.env"
+            echo ".env created from .env.example."
+          fi
+      - name: Build debug APK
+        script: |
+          chmod +x ./gradlew 2>/dev/null || true
+          ./gradlew assembleDebug
+      - name: Run unit tests
+        script: |
+          ./gradlew testDebugUnitTest
+        ignore_failure: true
+    artifacts:
+      - app/build/outputs/**/*.apk
+      - app/build/outputs/**/mapping.txt
+      - app/build/reports/tests/**/*
+    publishing:
+      email:
+        recipients:
+          - sukru.caglar@almila.com.tr
+        notify:
+          success: true
+          failure: true
+
+  android-release-workflow:
+    name: Android Release Build
+    max_build_duration: 60
+    instance_type: linux_x2
+    environment:
+      vars:
+        PACKAGE_NAME: "com.aistudio.sahamontaj.pqvzkt"
+      groups:
+        - android_release_credentials
+      java: 17
+    scripts:
+      - name: Set Android SDK location
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+      - name: Decode release keystore from env var
+        script: |
+          if [ -n "$CM_KEYSTORE" ]; then
+            echo "$CM_KEYSTORE" | base64 -d > "$CM_BUILD_DIR/my-upload-key.jks"
+            export KEYSTORE_PATH="$CM_BUILD_DIR/my-upload-key.jks"
+            echo "KEYSTORE_PATH=$KEYSTORE_PATH" >> $CM_ENV
+            echo "Release keystore restored."
+          else
+            echo "CM_KEYSTORE env var is not set. Configure it in Codemagic UI."
+            exit 1
+          fi
+      - name: Create .env file from .env.example if missing
+        script: |
+          if [ ! -f "$CM_BUILD_DIR/.env" ] && [ -f "$CM_BUILD_DIR/.env.example" ]; then
+            cp "$CM_BUILD_DIR/.env.example" "$CM_BUILD_DIR/.env"
+          fi
+      - name: Build release AAB
+        script: |
+          chmod +x ./gradlew 2>/dev/null || true
+          ./gradlew bundleRelease
+      - name: Build release APK
+        script: |
+          ./gradlew assembleRelease
+    artifacts:
+      - app/build/outputs/**/*.aab
+      - app/build/outputs/**/*.apk
+      - app/build/outputs/**/mapping.txt
+    publishing:
+      email:
+        recipients:
+          - sukru.caglar@almila.com.tr
+        notify:
+          success: true
+          failure: true
