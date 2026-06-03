@@ -19,6 +19,15 @@ workflows:
       - name: Set Android SDK location
         script: |
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+      - name: Ensure Gradle Wrapper exists and is executable
+        script: |
+          cd "$CM_BUILD_DIR"
+          if [ ! -f ./gradlew ]; then
+            echo "gradlew missing, generating via system gradle..."
+            gradle wrapper --gradle-version=9.0 --distribution-type=bin
+          fi
+          sed -i 's/\r$//' ./gradlew || true
+          chmod +x ./gradlew
       - name: Restore debug.keystore from base64
         script: |
           if [ -f "$CM_BUILD_DIR/debug.keystore.base64" ]; then
@@ -35,8 +44,7 @@ workflows:
           fi
       - name: Build debug APK
         script: |
-          chmod +x ./gradlew 2>/dev/null || true
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --stacktrace
       - name: Run unit tests
         script: |
           ./gradlew testDebugUnitTest
@@ -67,6 +75,14 @@ workflows:
       - name: Set Android SDK location
         script: |
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+      - name: Ensure Gradle Wrapper exists and is executable
+        script: |
+          cd "$CM_BUILD_DIR"
+          if [ ! -f ./gradlew ]; then
+            gradle wrapper --gradle-version=9.0 --distribution-type=bin
+          fi
+          sed -i 's/\r$//' ./gradlew || true
+          chmod +x ./gradlew
       - name: Decode release keystore from env var
         script: |
           if [ -n "$CM_KEYSTORE" ]; then
@@ -85,11 +101,10 @@ workflows:
           fi
       - name: Build release AAB
         script: |
-          chmod +x ./gradlew 2>/dev/null || true
-          ./gradlew bundleRelease
+          ./gradlew bundleRelease --stacktrace
       - name: Build release APK
         script: |
-          ./gradlew assembleRelease
+          ./gradlew assembleRelease --stacktrace
     artifacts:
       - app/build/outputs/**/*.aab
       - app/build/outputs/**/*.apk
