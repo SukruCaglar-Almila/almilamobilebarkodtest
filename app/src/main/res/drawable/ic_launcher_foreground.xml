@@ -1,0 +1,43 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Outer industrial gear (Assembly symbol) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,26c15.5,0 28,12.5 28,28s-12.5,28 -28,28s-28,-12.5 -28,-28S38.5,26 54,26z M54,18c-19.9,0 -36,16.1 -36,36s16.1,36 36,36s36,-16.1 36,-36S73.9,18 54,18z"/>
+
+    <!-- 8 Gear tooth segments -->
+    <path android:fillColor="#FFFFFF" android:pathData="M50,11h8v10h-8z"/>
+    <path android:fillColor="#FFFFFF" android:pathData="M11,50h10v8h-10z"/>
+    <path android:fillColor="#FFFFFF" android:pathData="M50,87h8v10h-8z"/>
+    <path android:fillColor="#FFFFFF" android:pathData="M87,50h10v8h-10z"/>
+    
+    <!-- Diagonal teeth -->
+    <path android:fillColor="#FFFFFF" android:pathData="M24,24l7.1,-7.1l7.1,7.1l-7.1,7.1z"/>
+    <path android:fillColor="#FFFFFF" android:pathData="M69,69l7.1,-7.1l7.1,7.1l-7.1,7.1z"/>
+    <path android:fillColor="#FFFFFF" android:pathData="M24,69l7.1,7.1l7.1,-7.1l-7.1,-7.1z"/>
+    <path android:fillColor="#FFFFFF" android:pathData="M69,24l7.1,7.1l7.1,-7.1l-7.1,-7.1z"/>
+    
+    <!-- Central Camera Icon (Photo confirmation symbol) -->
+    <path
+        android:fillColor="#60A5FA"
+        android:pathData="M38,42 C36.9,42 36,42.9 36,44 L36,66 C36,67.1 36.9,68 38,68 L70,68 C71.1,68 72,67.1 72,66 L72,44 C72,42.9 71.1,42 70,42 L58,42 L54,37 L46,42 Z"/>
+        
+    <!-- camera lens white circle outer -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,47c5.5,0 10,4.5 10,10s-4.5,10 -10,10s-10,-4.5 -10,-10S48.5,47 54,47z"/>
+        
+    <!-- camera lens blue inner -->
+    <path
+        android:fillColor="#1E3A8A"
+        android:pathData="M54,50c3.9,0 7,3.1 7,7s-3.1,7 -7,7s-7,-3.1 -7,-7S50.1,50 54,50z"/>
+
+    <!-- small confirmation checkmark badge in green -->
+    <path
+        android:fillColor="#10B981"
+        android:pathData="M64,61 L68,65 L76,57 L78,59 L68,69 L62,63 Z"/>
+</vector>
